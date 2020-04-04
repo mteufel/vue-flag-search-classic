@@ -13,7 +13,6 @@
 
 <script>
 import vSelect from "vue-select";
-import { eventBus } from '../main'
 import "vue-select/dist/vue-select.css";
 
 export default {
@@ -28,8 +27,12 @@ export default {
     };
   },
   methods: {
-    onSelection(value) {
-      eventBus.$emit('country-changed', value)
+    onSelection(selection) {
+      fetch("https://restcountries.eu/rest/v2/name/" + selection).then(res => {
+        res.json().then(json =>  {
+          this.$parent.$emit('countryChanged', json.map(e => e.alpha2Code)[0].toLowerCase());
+        })
+      })
     },
     onSearch(search) {
       this.search(search);

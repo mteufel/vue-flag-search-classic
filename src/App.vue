@@ -1,16 +1,18 @@
 <template>
   <div id="app">
     <AppHeader title="Welcome to Flag Search" />
-    <country-search />
-    <flag :country="country" />
+    <CountryPanel @countryChanged="countryChanged">
+      <CountrySearch />
+      <CountryFlag :country="country" />
+    </CountryPanel>
   </div>
 </template>
 
 <script>
 import AppHeader from "./components/AppHeader.vue";
-import CountrySearch from "./components/CountrySearch.vue";
-import { eventBus } from './main';
-import Flag from "./components/Flag.vue";
+import CountrySearch from "./components/CountrySearch.vue"
+import CountryPanel from "./components/CountryPanel.vue"
+import CountryFlag from "./components/CountryFlag.vue";
 
 export default {
   name: "App",
@@ -20,24 +22,15 @@ export default {
     }
   },
   methods: {
-    setCountryAlpha2Code: function(country) {
-      fetch("https://restcountries.eu/rest/v2/name/" + country).then(res => {
-        res.json().then(json =>  {
-           this.country = json.map(e => e.alpha2Code)[0].toLowerCase()
-        });
-      });
+    countryChanged: function(value) {
+      this.country = value
     }
   },
   components: {
     AppHeader,
+    CountryPanel,
     CountrySearch,
-    Flag
-  },
-  created: function() {
-    var self = this;
-    eventBus.$on('country-changed', (country) => {
-      self.setCountryAlpha2Code(country);
-    })
+    CountryFlag
   }
 };
 </script>
