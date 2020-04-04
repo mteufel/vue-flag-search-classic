@@ -1,19 +1,45 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App!"/>
+    <AppHeader title="Welcome to Flag Search" />
+    <country-search />
+    <flag :country="country" />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import AppHeader from "./components/AppHeader.vue";
+import CountrySearch from "./components/CountrySearch.vue";
+import { eventBus } from './main';
+import Flag from "./components/Flag.vue";
 
 export default {
-  name: 'App',
+  name: "App",
+  data: function() {
+    return {
+      country: 'gb'
+    }
+  },
+  methods: {
+    setCountryAlpha2Code: function(country) {
+      fetch("https://restcountries.eu/rest/v2/name/" + country).then(res => {
+        res.json().then(json =>  {
+           this.country = json.map(e => e.alpha2Code)[0].toLowerCase()
+        });
+      });
+    }
+  },
   components: {
-    HelloWorld
+    AppHeader,
+    CountrySearch,
+    Flag
+  },
+  created: function() {
+    var self = this;
+    eventBus.$on('country-changed', (country) => {
+      self.setCountryAlpha2Code(country);
+    })
   }
-}
+};
 </script>
 
 <style>
