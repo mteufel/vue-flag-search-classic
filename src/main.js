@@ -1,8 +1,9 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
+import Antd from 'ant-design-vue';
 
-Vue.config.productionTip = false
+import 'ant-design-vue/dist/antd.css';
 
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+const app = createApp(App)
+app.use(Antd);
+app.mount('#app')

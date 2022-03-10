@@ -1,48 +1,61 @@
 <template>
   <div>
-    <v-select
-      class="country-search"
-      v-model="selected"
+     <a-select class="country-search"
+      show-search
+      placeholder="search for a country here"
+      :show-arrow="false"
       :options="options"
-      @input="onSelection"
       @search="onSearch"
-    />
+      @select="onSelection"
+      v-model:value="value1"
+      :filter-option="false" >
+      <template v-if="fetching" #notFoundContent>
+            <a-spin size="small" />
+      </template>
+     </a-select>
+
   </div>
   
 </template>
 
 <script>
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
 
 export default {
   name: "CountrySearch",
   components: {
-    vSelect
+  //  vSelect
   },
   data: function() {
     return {
+      fetching: false,
       options: [],
-      selected: ""
+      value1: []
     };
   },
   methods: {
-    onSelection(selection) {
-      fetch("https://restcountries.eu/rest/v2/name/" + selection).then(res => {
-        res.json().then(json =>  {
-          this.$parent.$emit('countryChanged', json.map(e => e.alpha2Code)[0].toLowerCase());
-        })
-      })
+    onFocus() {
+      console.log('Focus')
+    },
+    onSelection(value, option) {
+      console.log('onSelection: ', { value, option })
+      console.log('onSelection: ', this.value1)
+      this.$parent.$emit('countryChanged', this.value1.toLowerCase());
     },
     onSearch(search) {
+      console.log('onSearch ', search)
       this.search(search);
     },
     search(search) {
       if (search === "") {
         return;
       }
-      fetch("https://restcountries.eu/rest/v2/name/" + search).then(res => {
-        res.json().then(json => (this.options = json.map(e => e.name)));
+      this.fetching = true
+      fetch("https://restcountries.com/v2/name/" + search).then(res => {
+        res.json().then(json => { 
+          this.options = json.map(e => ( { label: e.name, value: e.alpha2Code } ) )
+          this.fetching = false
+          console.log(this.options)
+        });
       });
     }
   }
@@ -52,6 +65,7 @@ export default {
 <style>
 .country-search {
   display: block;
+  text-align: left;
   margin-left: auto;
   margin-right: auto;
   width: 400px;
